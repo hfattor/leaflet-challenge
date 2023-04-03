@@ -10,53 +10,91 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // URL for all earthquakes in the past 7 days from USGS Site
-const url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
+var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-// Get the data with d3.
-d3.json(url).then(function(response) {
+// Function to covert UNIX timestamp to datetime
+function convertTimestamp(x) {
+  var d = new Date(x),
+    yyyy = d.getFullYear(),
+    mm = ('0' + (d.getMonth() + 1)).slice(-2),  // Months are zero based. Add leading 0.
+    dd = ('0' + d.getDate()).slice(-2),         // Add leading 0.
+    hh = d.getHours(),
+    h = hh,
+    min = ('0' + d.getMinutes()).slice(-2),     // Add leading 0.
+    ampm = 'AM',
+    time;
 
+  if (hh > 12) {
+      h = hh - 12;
+      ampm = 'PM';
+  } else if (hh === 12) {
+      h = 12;
+      ampm = 'PM';
+  } else if (hh == 0) {
+      h = 12;
+  }
+
+  time = mm + '-' + dd + '-' + yyyy + ', ' +  h + ':' + min + ' ' + ampm;
+  return time;
+};
+
+// Function to determine choropleth color based on earthquake depth
+function iconColor(depth) {
+  if (depth > 90) {
+    return "#ff0000"
+  } else if (depth > 70) {
+    return "#ff9900"
+  } else if (depth > 50) {
+    return "#ffcc33"
+  } else if (depth >30) {
+    return "#ffff66"
+  } else if (depth >10) {
+    return "#ccff00"
+  } else {
+    return "#33ee33"
+  }
+
+};
+
+
+
+// Getting GeoJSON data
+d3.json(link).then(function(data) {
+
+  featureData = data.features
+  console.log(featureData)
+ 
     // Loop through the data
-    for (var i = 0; i < response.length; i++) {
+    for (var i = 0; i < featureData.length; i++) {
         
-    // Set the data location property to a variable
-    var location = response.features[i].geometry;
+    // Set the data location (lat, long, and depth) property to a variable
+    var location = data.features[i].geometry;
 
-    // Create a new choropleth color variable
-    iconColor = L.choropleth(response, {
+    // Set data magnitude property to a variable
+    var magnitude = data.features[i].properties.mag
 
-        // Define which property in the features to use
-        valueProperty: location.coordinates[2],
+    // Set earthquake depth to a variable
+    var depth = data.features[i].geometry.coordinates[2]
 
-        // Set the color scale.
-        scale: ["#33ee33", "ccff00", "ffff66", "ffcc33", "ff9900", "ff0000"],
+    // Set circle marker properties to a variable
+    var circleOptions = {radius: magnitude*5,
+      color: 'black',
+      weight: 1,
+      fillColor: iconColor(depth),
+      fillOpacity: 0.8
+    };
 
-        // The number of breaks in the step range
-        steps: 6,
-        mode: "q",
-        style: {
-            // Border color
-            color: "#fff",
-            weight: 1,
-            fillOpacity: 0.8
-            },
+    // Set time to a variable
+    var timestamp = data.features[i].properties.time
 
-     }).addTo(myMap);
+    dateTime = convertTimestamp(timestamp)
 
-    // Create markers
-    var markers = L.circleMarker();
-  
-         // Check for the location property
-      if (location) {
-  
-        // Add a new marker to the cluster group, and bind a popup
-        markers.addLayer(L.marker([location.coordinates[1], location.coordinates[0]])
-          .bindPopup(response.features[i].properties.title));
-      }
-  
+        // Create markers
+    new L.circleMarker([location.coordinates[1], location.coordinates[0]], circleOptions)
+    .bindPopup("<strong>Time: </strong>" + dateTime + "<br />" + data.features[i].properties.title)
+    .addTo(myMap);
     }
-  
-    // Add marker layer to the map.
-    myMap.addLayer(markers);
-  
+
+    console.log(location);
+
   });
-  
