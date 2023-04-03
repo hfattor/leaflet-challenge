@@ -39,23 +39,14 @@ function convertTimestamp(x) {
 };
 
 // Function to determine choropleth color based on earthquake depth
-function iconColor(depth) {
-  if (depth > 90) {
-    return "#ff0000"
-  } else if (depth > 70) {
-    return "#ff9900"
-  } else if (depth > 50) {
-    return "#ffcc33"
-  } else if (depth >30) {
-    return "#ffff66"
-  } else if (depth >10) {
-    return "#ccff00"
-  } else {
-    return "#33ee33"
-  }
-
+function getColor(depth) {
+  return depth > 90 ? '#ff0000':
+  depth > 70 ? '#ff9900':
+  depth > 50 ? '#ffcc33':
+  depth > 30 ? '#ffff66':
+  depth > 10 ? '#ccff00':
+  '#33ee33';
 };
-
 
 
 // Getting GeoJSON data
@@ -80,7 +71,7 @@ d3.json(link).then(function(data) {
     var circleOptions = {radius: magnitude*5,
       color: 'black',
       weight: 1,
-      fillColor: iconColor(depth),
+      fillColor: getColor(depth),
       fillOpacity: 0.8
     };
 
@@ -89,12 +80,26 @@ d3.json(link).then(function(data) {
 
     dateTime = convertTimestamp(timestamp)
 
-        // Create markers
+    // Create markers
     new L.circleMarker([location.coordinates[1], location.coordinates[0]], circleOptions)
-    .bindPopup("<strong>Time: </strong>" + dateTime + "<br />" + data.features[i].properties.title)
+    .bindPopup("<strong>Time: </strong>" + dateTime + "<br /><strong>Magnitude: </strong>" + magnitude +"<br /><strong>Location: </strong>" + data.features[i].properties.place)
     .addTo(myMap);
     }
 
-    console.log(location);
-
   });
+
+   // Set up the legend.
+   var legend = L.control({ position: "bottomright" });
+    legend.onAdd = function(map) {
+     var div = L.DomUtil.create("div", "info legend")
+     var labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
+
+     for (var i = 0; i < labels.length; i++) {
+      div.innerHTML += '<i style="background:' + getColor(labels[i]) + '"></i> ' + labels[i] + '<br>';
+      }
+    return div;
+    };
+ 
+   // Adding the legend to the map
+   legend.addTo(myMap);
+ 
