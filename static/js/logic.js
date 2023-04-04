@@ -82,24 +82,51 @@ d3.json(link).then(function(data) {
 
     // Create markers
     new L.circleMarker([location.coordinates[1], location.coordinates[0]], circleOptions)
-    .bindPopup("<strong>Time: </strong>" + dateTime + "<br /><strong>Magnitude: </strong>" + magnitude +"<br /><strong>Location: </strong>" + data.features[i].properties.place)
+    .bindPopup("<strong>Time: </strong>" + dateTime + "<br /><strong>Magnitude: </strong>" + magnitude +"<br /><strong>Location: </strong>" + data.features[i].properties.place +"<br /><strong>Depth: </strong>" + depth + " km")
     .addTo(myMap);
     }
 
   });
 
-   // Set up the legend.
-   var legend = L.control({ position: "bottomright" });
-    legend.onAdd = function(map) {
-     var div = L.DomUtil.create("div", "info legend")
-     var labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
+  // function getIcon(d) {
+  //   return d === "-10-10" ? '#ff0000':
+  //   d === "10-30" ? '#ff9900':
+  //   d === "30-50" ? '#ffcc33':
+  //   d === "50-70" ? '#ffff66':
+  //   d === "70-90" ? '#ccff00':
+  //   d === "90+" ? '#33ee33';
+  // };
 
-     for (var i = 0; i < labels.length; i++) {
-      div.innerHTML += '<i style="background:' + getColor(labels[i]) + '"></i> ' + labels[i] + '<br>';
-      }
+  // Set up the legend
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function() {
+   var div = L.DomUtil.create("div", "info legend");
+   var labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
+   var colors = ['#ff0000', '#ff9900', '#ffcc33', '#ffff66', '#ccff00','#33ee33']
+   var colorLabels = []
+   var legendInfo = "<h1>Eartquake Depth</h1>" +
+   "<div class=\"labels\">" +
+     "<div class=\"min\">" + labels[0] + "</div>" +
+     "<div class=\"mid1\">" + labels[1] + "</div>" +
+     "<div class=\"mid2\">" + labels[2] + "</div>" +
+     "<div class=\"mid3\">" + labels[3] + "</div>" +
+     "<div class=\"mid4\">" + labels[4] + "</div>" +
+     "<div class=\"mid5\">" + labels[5] + "</div>" +
+     "<div class=\"max\">" + labels[6] + "</div>" +
+   "</div>";
+   
+   div.innerHTML = legendInfo;
+
+
+   labels.forEach(function(label, index) {
+    colorLabels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+   });
+
+    div.innerHTML += "<ul>" + colorLabels.join("") + "</ul>";
     return div;
-    };
- 
-   // Adding the legend to the map
-   legend.addTo(myMap);
+   };
+
+
+ // Adding the legend to the map
+ legend.addTo(myMap);
  
