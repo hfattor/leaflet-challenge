@@ -88,41 +88,23 @@ d3.json(link).then(function(data) {
 
   });
 
-  // function getIcon(d) {
-  //   return d === "-10-10" ? '#ff0000':
-  //   d === "10-30" ? '#ff9900':
-  //   d === "30-50" ? '#ffcc33':
-  //   d === "50-70" ? '#ffff66':
-  //   d === "70-90" ? '#ccff00':
-  //   d === "90+" ? '#33ee33';
-  // };
 
   // Set up the legend
   var legend = L.control({ position: "bottomright" });
   legend.onAdd = function() {
    var div = L.DomUtil.create("div", "info legend");
-   var labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
-   var colors = ['#ff0000', '#ff9900', '#ffcc33', '#ffff66', '#ccff00','#33ee33']
-   var colorLabels = []
-   var legendInfo = "<h1>Eartquake Depth</h1>" +
-   "<div class=\"labels\">" +
-     "<div class=\"min\">" + labels[0] + "</div>" +
-     "<div class=\"mid1\">" + labels[1] + "</div>" +
-     "<div class=\"mid2\">" + labels[2] + "</div>" +
-     "<div class=\"mid3\">" + labels[3] + "</div>" +
-     "<div class=\"mid4\">" + labels[4] + "</div>" +
-     "<div class=\"mid5\">" + labels[5] + "</div>" +
-     "<div class=\"max\">" + labels[6] + "</div>" +
-   "</div>";
+   var labels = ["-10-10 km", "10-30 km", "30-50 km", "50-70 km", "70-90 km", "90+ km"];
+   var colors = ['#33ee33','#ccff00','#ffff66', '#ffcc33', '#ff9900','#ff0000'];
+   var colorLabels = [];
+   var legendInfo = "<h1>Earthquake Depth</h1>";
    
    div.innerHTML = legendInfo;
 
-
    labels.forEach(function(label, index) {
-    colorLabels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+    colorLabels.push("<i style=\"background:" + colors[index] + "\"></i>" + labels[index] + "<br>");
    });
 
-    div.innerHTML += "<ul>" + colorLabels.join("") + "</ul>";
+    div.innerHTML += colorLabels.join("") + "</div>";
     return div;
    };
 
