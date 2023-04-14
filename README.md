@@ -1,4 +1,4 @@
-# leaflet-challenge
+# Leaflet Earthquake Map
 D3 imports GeoJSON data from the U.S. Geological Survey (USGS)on the past 7 days of earthquakes worldwide. A Leaflet map plots all the earthquakes based on their longitude and latitude. The size of the markers represents the earthquake magnitude. The color of the markers represents the depth of each earthquake in km. Clicking on the markers provides additional information on the earthquake, including the data and time it occurred, the magnitude, the location of the earthquake, and the earthquake's depth. 
 
 ### Data and Code Sources
